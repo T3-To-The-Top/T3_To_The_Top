@@ -2,6 +2,7 @@ import * as THREE from '../three.js-master/build/three.module.js';
 import { TransformControls } from '../three.js-master/examples/jsm/controls/TransformControls.js';
 import Stats from '../three.js-master/examples/jsm/libs/stats.module.js';
 import { Flow } from '../three.js-master/examples/jsm/modifiers/CurveModifier.js';
+import { CurvePathCustom } from '../Curve_path.module.js';
 
 const ACTION_SELECT = 1, ACTION_NONE = 0;
 const curveHandles = [];
@@ -29,22 +30,14 @@ function init() {
         1,
         1000
     );
-    camera.position.set(2, 2, 4);
+    camera.position.set(30, 30, 10);
     camera.lookAt(scene.position);
-
-    const curve = new THREE.QuadraticBezierCurve(
-        new THREE.Vector2( -10, 0 ),
-        new THREE.Vector2( 20, 15 ),
-        new THREE.Vector2( 10, 0 )
-    );
-
-    const points = curve.getPoints( 50 );
-    const curveGeometry = new THREE.BufferGeometry().setFromPoints( points );
-    const curveMaterial = new THREE.LineBasicMaterial( {color: 0xffff00} );
-    const curveLine = new THREE.Line( curveGeometry, curveMaterial );
-
+    
+    //custom curve class in Curve_path.module.js
+    const curveObj = new CurvePathCustom(new THREE.Vector3( -10, 0, 1 ), new THREE.Vector3( 20, 15, 1 ), new THREE.Vector3( 10, 0, 1 ), 0xffff00);
+    const curve = curveObj.curve;
+    const curveLine = curveObj.line;
     scene.add( curveLine );
-    //
 
     const light = new THREE.DirectionalLight(0xffaa33);
     light.position.set(- 10, 10, 10);
@@ -58,7 +51,7 @@ function init() {
     //
     const ringGeometry = new THREE.RingGeometry(0.1, 0.2, 50);
     const ringMeterial = new THREE.MeshBasicMaterial( {color: 0xffff00, side: THREE.DoubleSide});
-    const ringMesh = new THREE.Mesh( ringGeometry, ringMeterial);
+    const ringMesh = new THREE.Mesh( ringGeometry, ringMeterial );
 
     flow = new Flow(ringMesh);
     flow.updateCurve(0, curve);
@@ -82,13 +75,11 @@ function init() {
             const points = curve.getPoints(50);
             curveLine.geometry.setFromPoints(points);
             flow.updateCurve(0, curve);
-
         }
 
     });
 
     stats = new Stats();
-    console.log(stats);
     document.body.appendChild(stats.dom);
 
     window.addEventListener('resize', onWindowResize);
@@ -116,21 +107,6 @@ function animate() {
 
     requestAnimationFrame(animate);
 
-    if (action === ACTION_SELECT) {
-
-        rayCaster.setFromCamera(mouse, camera);
-        action = ACTION_NONE;
-        const intersects = rayCaster.intersectObjects(curveHandles, false);
-        if (intersects.length) {
-
-            const target = intersects[0].object;
-            control.attach(target);
-            scene.add(control);
-
-        }
-
-    }
-
     if (flow) {
 
         flow.moveAlongCurve(0.001);
@@ -146,5 +122,4 @@ function render() {
     renderer.render(scene, camera);
 
     stats.update();
-
 }
