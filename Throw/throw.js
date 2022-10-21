@@ -42,7 +42,7 @@ window.onload = function init()
 	loader.load('./first_person_cso_airbuster/scene.gltf', function(gltf){
 		person = gltf.scene.children[0];
 		person.scale.set(500,500,500);
-		person.position.set(-300, 200, 0);
+		person.position.set(0, 0, 0);
 
 		mixer = new THREE.AnimationMixer( gltf.scene );
 		var action = mixer.clipAction( gltf.animations[0] );
@@ -105,6 +105,10 @@ window.onload = function init()
 
 	function animate(time) {
 		time *=0.001;
+
+		if(person){
+			camera.position.set(person.position.x,person.position.y+10,person.position.z-20);
+		}
 
 		var delta = clock.getDelta();
 
