@@ -94,7 +94,7 @@ window.onload = function init()
 			console.log("x  :"+selected.point.x);
 			console.log("y  :"+selected.point.y);
 			console.log("z  :"+selected.point.z);
-		} 
+		}
 	});
 
     window.addEventListener('keydown', (event) => {
