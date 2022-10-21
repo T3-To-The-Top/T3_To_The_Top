@@ -7,7 +7,9 @@ import { Flow } from '../three.js-master/examples/jsm/modifiers/CurveModifier.js
 import { CurvePathCustom } from '../Curve_path.module.js';
 
 let playerCoord;
-let person
+let person;
+let flow;
+let potalMove = false;
 
 window.onload = function init()
 {
@@ -49,14 +51,14 @@ window.onload = function init()
     const curve = new CurvePathCustom(new THREE.Vector3(-220, 200, 0), new THREE.Vector3(0, 0, 0,), new THREE.Vector3(-50, 100, 200), 0xffff00);
     scene.add(curve.line);
 
-    /*const ringGeometry = new THREE.RingGeometry(1, 2, 50);
+    const ringGeometry = new THREE.RingGeometry(1, 2, 50);
     const ringMeterial = new THREE.MeshBasicMaterial( {color: 0xffff00, side: THREE.DoubleSide});
     ringGeometry.rotateY(Math.PI / -2)
     const ringMesh = new THREE.Mesh( ringGeometry, ringMeterial );
 
     flow = new Flow(ringMesh);
-    flow.updateCurve(0, curve);
-    scene.add(flow.object3D);*/
+    flow.updateCurve(0, curve.curve);
+    scene.add(flow.object3D);
 
 	window.addEventListener('mousedown', (event) => {
 		event.preventDefault();
@@ -74,11 +76,21 @@ window.onload = function init()
 			console.log("y  :"+selected.point.y);
 			console.log("z  :"+selected.point.z);
 		} 
-	})
+	});
+
+    window.addEventListener('keydown', (event) => {
+        event.preventDefault();
+
+        potalMove = !potalMove;
+    });
 
 	function animate(time) {
 		time *=0.001;
 		renderer.render(scene,camera);
+
+        if(potalMove){
+            flow.moveAlongCurve(0.0009);
+        }
 		requestAnimationFrame(animate);
 	}
 }
