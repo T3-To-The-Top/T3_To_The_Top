@@ -1,0 +1,11 @@
+Model Information:
+* title:	First Person CSO Airbuster
+* source:	https://sketchfab.com/3d-models/first-person-cso-airbuster-97b4ff33400b4b519b5659af4e5f2ae8
+* author:	Amine.Elouneg (https://sketchfab.com/Amine.Elouneg)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "First Person CSO Airbuster" (https://sketchfab.com/3d-models/first-person-cso-airbuster-97b4ff33400b4b519b5659af4e5f2ae8) by Amine.Elouneg (https://sketchfab.com/Amine.Elouneg) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
