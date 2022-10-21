@@ -1,14 +1,9 @@
 import * as THREE from '../three.js-master/build/three.module.js';
 import { GLTFLoader } from '../three.js-master/examples/jsm/loaders/GLTFLoader.js'
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { TransformControls } from '../three.js-master/examples/jsm/controls/TransformControls.js';
-import Stats from '../three.js-master/examples/jsm/libs/stats.module.js';
 import { Flow } from '../three.js-master/examples/jsm/modifiers/CurveModifier.js';
 import { CurvePathCustom } from '../Curve_path.module.js';
 
-let playerCoord;
 let person;
-let mesh;
 let mixer;
 
 var clock = new THREE.Clock();;
@@ -22,18 +17,13 @@ window.onload = function init()
 	canvas.height = window.innerHeight;
 
 	const renderer = new THREE.WebGLRenderer({canvas});
-	renderer.setSize(canvas.width,canvas.height);
+	renderer.setSize(1280,720);
 
 	const scene = new THREE.Scene();
 	scene.background = new THREE.Color(0x0000FF);
 
-	const camera = new THREE.PerspectiveCamera(75, canvas.width/ canvas.height, 1, 1000);
+	const camera = new THREE.PerspectiveCamera(75, 1280/720, 1, 1000);
 	//camera.rotation.y = 180/180*Math.PI;
-	camera.position.x = -400;
-	camera.position.y = 200;
-	camera.position.z = 0;
-
-	const controls = new OrbitControls(camera, renderer.domElement);
 
 	const hlight = new THREE.AmbientLight (0x404040,50);
 	scene.add(hlight);
@@ -53,19 +43,6 @@ window.onload = function init()
 	}, undefined, function (error) {
 		console.error(error);
 	});
-
-	if(person){
-		console.log(playerCoord);
-	}
-
-	if(playerCoord){
-		playerCoord = ["player",person.position.x, person.position.y, person.position.z];
-	}
-
-
-	if(playerCoord){
-		console.log(playerCoord);
-	}
     
     const curve = new CurvePathCustom(new THREE.Vector3(-220, 200, 0), new THREE.Vector3(0, 0, 0,), new THREE.Vector3(-50, 100, 200), 0xffff00);
     scene.add(curve.line);
@@ -99,7 +76,6 @@ window.onload = function init()
 
     window.addEventListener('keydown', (event) => {
         event.preventDefault();
-
         potalMove = !potalMove;
     });
 
@@ -107,7 +83,13 @@ window.onload = function init()
 		time *=0.001;
 
 		if(person){
-			camera.position.set(person.position.x,person.position.y+10,person.position.z-20);
+			person.position.set(
+				camera.position.x - Math.sin(camera.rotation.y + Math.PI/6) * 0.75,
+				camera.position.y - 0.5 + Math.sin(time*4 + camera.position.x + camera.position.z)*0.01,
+				-15 + camera.position.z + Math.cos(camera.rotation.y + Math.PI/6) * 0.75
+			);
+
+			person.rotation.z = 180/180*Math.PI;
 		}
 
 		var delta = clock.getDelta();
