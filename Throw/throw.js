@@ -7,7 +7,11 @@ import { Flow } from '../three.js-master/examples/jsm/modifiers/CurveModifier.js
 import { CurvePathCustom } from '../Curve_path.module.js';
 
 let playerCoord;
-let person
+let person;
+let mesh;
+let mixer;
+
+var clock = new THREE.Clock();
 
 window.onload = function init()
 {
@@ -37,7 +41,10 @@ window.onload = function init()
 		person = gltf.scene.children[0];
 		person.scale.set(500,500,500);
 		person.position.set(-300, 200, 0);
-        playerCoord = [person.position.x, person.position.y, person.position.z];
+
+		mixer = new THREE.AnimationMixer( gltf.scene );
+		var action = mixer.clipAction( gltf.animations[0] );
+		action.play();
 
 		scene.add(gltf.scene);
 		animate(10);
@@ -45,7 +52,19 @@ window.onload = function init()
 		console.error(error);
 	});
 
-    console.log(playerCoord);
+	if(person){
+		console.log(playerCoord);
+	}
+
+	if(playerCoord){
+		playerCoord = ["player",person.position.x, person.position.y, person.position.z];
+	}
+
+
+	if(playerCoord){
+		console.log(playerCoord);
+	}
+    
     const curve = new CurvePathCustom(new THREE.Vector3(-220, 200, 0), new THREE.Vector3(0, 0, 0,), new THREE.Vector3(-50, 100, 200), 0xffff00);
     scene.add(curve.line);
 
@@ -78,6 +97,11 @@ window.onload = function init()
 
 	function animate(time) {
 		time *=0.001;
+
+		var delta = clock.getDelta();
+
+		if ( mixer ) mixer.update( delta );
+
 		renderer.render(scene,camera);
 		requestAnimationFrame(animate);
 	}
