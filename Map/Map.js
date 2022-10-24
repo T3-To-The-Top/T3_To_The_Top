@@ -1,3 +1,5 @@
+import { RandomObjectGeneration } from "../Random_object_generation.module";
+
 // 3차원 세계
 var scene = new THREE.Scene();
 
@@ -17,36 +19,9 @@ var loader = new THREE.TextureLoader();
 var loaderMesh = new THREE.ColladaLoader();
 
 // 바닥
-var floor,floor2, floor3;
-floor = new THREE.Mesh(
-    new THREE.BoxGeometry(10, 10, 10)
-);
-floor2 = new THREE.Mesh(
-    new THREE.BoxGeometry(10, 10, 10)
-);
-floor3 = new THREE.Mesh(
-    new THREE.BoxGeometry(10, 10, 10)
-);
-loader.load(
-        'http://dreamplan7.cafe24.com/canvas/img/floor1.jpg', 
-        function ( texture ) {
-            floor.material = new THREE.MeshStandardMaterial({map: texture});
-            floor.material.map.repeat.x=3;
-            floor.material.map.repeat.y=3;
-            floor.material.map.wrapS=THREE.RepeatWrapping;
-            floor.material.map.wrapT=THREE.RepeatWrapping;
-        }
-);
-scene.add(floor);
-scene.add(floor2);
-scene.add(floor3);
+scene.add(new RandomObjectGeneration());
 
 
-floor.position.set(0, 50, 0);
-floor2.position.set(0, 30, 0);
-floor3.position.set(0, 10, 0);
-
-floor.receiveShadow=true;
 
 // 카메라의 위치 조정
 camera.position.set ( 25, 5, 3 );
@@ -133,7 +108,7 @@ var framesPerSecond=30;
 var animate = function () {
     // 프레임 처리
     setTimeout(function() {
-         requestAnimationFrame(animate); 
+        requestAnimationFrame(animate); 
     }, 1000 / framesPerSecond);
 
     water.material.uniforms[ 'time' ].value += 1.0 / 60.0;
