@@ -45,6 +45,7 @@
 		import { Capsule } from 'three/addons/math/Capsule.js';
 
 		import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+		import { RandomObjectGeneration } from "../Random_object_generation.module.js";
 
 		const clock = new THREE.Clock();
 
@@ -130,11 +131,21 @@
 		const vector2 = new THREE.Vector3();
 		const vector3 = new THREE.Vector3();
 
+
+		var objects = new RandomObjectGeneration(2, 5,-5, 5, 5, 2);
+
+// 바닥
+		scene.add(objects.floor);
+
+		worldOctree.fromGraphNode(objects.floor);
+		
+
 		var ballPower = 1;
 		
 
 		//var powerGuage = new THREE.Mesh(new THREE.BoxGeometry(1, 2, 1), new THREE.MeshBasicMaterial({ color: 0xffff00 }));
 		//scene.add(powerGuage);
+
 
 		document.addEventListener('keydown', (event) => {
 

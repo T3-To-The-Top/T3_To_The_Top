@@ -1,4 +1,4 @@
-import * as THREE from '../three.js-master/build/three.module.js';
+import * as THREE from './three.js-master/build/three.module.js';
 import { TransformControls } from '../three.js-master/examples/jsm/controls/TransformControls.js';
 import Stats from '../three.js-master/examples/jsm/libs/stats.module.js';
 import { Flow } from '../three.js-master/examples/jsm/modifiers/CurveModifier.js';
