@@ -22,7 +22,7 @@ var model;
 var loader = new THREE.TextureLoader();
 var loaderMesh = new ColladaLoader();
 
-var objects = new RandomObjectGeneration();
+var objects = new RandomObjectGeneration(2, 5,-5, 5, 5, 2);
 
 // 바닥
 scene.add(objects.floor);

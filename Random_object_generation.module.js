@@ -6,15 +6,15 @@ import { Object3D } from './three.js-master/build/three.module.js';
 
 export class RandomObjectGeneration {
 
-    constructor(){
+    constructor(posX, posY, posZ, sizeX, sizeY, sizeZ){
 
+        this.geometry = new THREE.BoxGeometry(sizeX, sizeY, sizeZ);
+        this.material = new THREE.MeshBasicMaterial({color: 0x00ff00})
         // 바닥
-        this.floor = new Object3D( new THREE.Mesh(
-            new THREE.BoxGeometry(10, 10, 10)
-        ));
-
-        this.floor.position.set(0, 50, 0);
-        this.floor.receiveShadow=true;
+        this.floor = new THREE.Mesh( this.geometry, this.material);
+        this.floor.position.x = posX;
+        this.floor.position.y = posY;
+        this.floor.position.z = posZ;
 
     }
 }
