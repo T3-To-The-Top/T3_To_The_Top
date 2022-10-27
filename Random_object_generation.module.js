@@ -8,10 +8,15 @@ export class RandomObjectGeneration {
 
     constructor(posX, posY, posZ, sizeX, sizeY, sizeZ){
 
+        //BOX 만들고 크기 지정 -> Vertex
         this.geometry = new THREE.BoxGeometry(sizeX, sizeY, sizeZ);
+        //색깔 지정 -> Fragment
         this.material = new THREE.MeshBasicMaterial({color: 0x00ff00})
-        // 바닥
+
+        // render를 하는 API이다.
         this.floor = new THREE.Mesh( this.geometry, this.material);
+        
+        //다 만들어놓은 애의 위치를 지정한다.
         this.floor.position.x = posX;
         this.floor.position.y = posY;
         this.floor.position.z = posZ;

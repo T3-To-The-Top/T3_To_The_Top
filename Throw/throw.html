@@ -5,6 +5,16 @@
 	<title>T3 - To The Top</title>
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+	<style>
+		canvas{
+			position: relative;
+		}
+		progress{
+			z-index: 1;
+			position: absolute;
+			top: 50%;
+		}
+	</style>
 </head>
 
 <body style="overflow-y:hidden">
@@ -132,20 +142,17 @@
 		const vector3 = new THREE.Vector3();
 
 
+		//Box 생성
 		var objects = new RandomObjectGeneration(2, 5,-5, 5, 5, 2);
 
-// 바닥
+		//씬에 추가
 		scene.add(objects.floor);
 
+		//충돌판정을 추가
 		worldOctree.fromGraphNode(objects.floor);
 		
 
 		var ballPower = 1;
-		
-
-		//var powerGuage = new THREE.Mesh(new THREE.BoxGeometry(1, 2, 1), new THREE.MeshBasicMaterial({ color: 0xffff00 }));
-		//scene.add(powerGuage);
-
 
 		document.addEventListener('keydown', (event) => {
 
