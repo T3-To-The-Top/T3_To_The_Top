@@ -4,14 +4,19 @@
 			body { margin: 0; }
 			canvas { width: 100%; height: 100% }
 		</style>
+		
 	</head>
+	
 	<body>
-		<script src="http://dreamplan7.cafe24.com/canvas2/js/three.js"></script>
-		<script src="http://dreamplan7.cafe24.com/canvas2/js/OrbitControls.js"></script>
-		<script src="http://dreamplan7.cafe24.com/canvas2/js/ColladaLoader.js"></script>		
-		<script src="http://dreamplan7.cafe24.com/canvas2/js/Sky.js"></script>		
-		<script src="http://dreamplan7.cafe24.com/canvas2/js/Water.js"></script>		
-		<script type="module" src="./Map.js"></script>
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../three.js-master/build/three.module.js",
+					"three/addons/": "../three.js-master/examples/jsm/"
+				}
+			}
+		</script>
 		<script type="module" src="../Random_object_generation.module.js"></script>
+		<script type="module" src="./Map.js"></script>
 	</body>
 </html>
