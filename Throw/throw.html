@@ -2,18 +2,18 @@
 <html lang="en">
 
 <head>
-	<title>three.js webgl - curve modifier</title>
+	<title>T3 - To The Top</title>
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
 </head>
 
-<body>
-	<div id="info">
-		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - curve modifier
-		<button id="btn1"> press </button>
+<body style="overflow-y:hidden">
+	<div id="info" style="width: 100%; height: 5rem; text-align: center;">
+		0
+		<progress id = "powerLevel" value="1" max="2" style="width:50%; height: inherit;"></progress>
+		2
 	</div>
 	<div id="container"></div>
-
 	<!-- Import maps polyfill -->
 	<!-- Remove this when import maps will be widely supported -->
 	<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
@@ -85,7 +85,7 @@
 		renderer.outputEncoding = THREE.sRGBEncoding;
 		renderer.toneMapping = THREE.ACESFilmicToneMapping;
 		container.appendChild(renderer.domElement);
-
+		
 		const stats = new Stats();
 		stats.domElement.style.position = 'absolute';
 		stats.domElement.style.top = '0px';
@@ -131,6 +131,7 @@
 		const vector2 = new THREE.Vector3();
 		const vector3 = new THREE.Vector3();
 
+
 		var objects = new RandomObjectGeneration(2, 5,-5, 5, 5, 2);
 
 // 바닥
@@ -138,8 +139,17 @@
 
 		worldOctree.fromGraphNode(objects.floor);
 		
+
+		var ballPower = 1;
+		
+
+		//var powerGuage = new THREE.Mesh(new THREE.BoxGeometry(1, 2, 1), new THREE.MeshBasicMaterial({ color: 0xffff00 }));
+		//scene.add(powerGuage);
+
+
 		document.addEventListener('keydown', (event) => {
 
+			console.log(event.code);
 			keyStates[event.code] = true;
 
 		});
@@ -196,7 +206,8 @@
 
 			// throw the ball with more force if we hold the button longer, and if we move forward
 
-			const impulse = 15 + 30 * (1 - Math.exp((mouseTime - performance.now()) * 0.001));
+			//기존 던지는 코드에 파워를 곱해버려서 속도 조절
+			const impulse = 15 + 30 * (1 - Math.exp((mouseTime - performance.now()) * 0.001)) * ballPower;
 
 			sphere.velocity.copy(playerDirection).multiplyScalar(impulse);
 			sphere.velocity.addScaledVector(playerVelocity, 2);
@@ -242,6 +253,7 @@
 
 			const deltaPosition = playerVelocity.clone().multiplyScalar(deltaTime);
 			playerCollider.translate(deltaPosition);
+			
 
 			playerCollisions();
 
@@ -305,10 +317,37 @@
 
 		}
 
+		//파워 레벨 올리는 로직
+		function levelUpper(){
+			var powerLevel = document.querySelector("#powerLevel");
+			console.log(powerLevel);
+			if(ballPower < 2) ballPower = ballPower + 0.01;
+
+			powerLevel.value = ballPower;
+		}
+
+		//파워레벨 내리는 로직
+		function levelDowner(){
+			var powerLevel = document.querySelector("#powerLevel");
+			
+			if(ballPower > 0) ballPower = ballPower - 0.01;
+
+			powerLevel.value = ballPower;
+		}
+
 		function controls(deltaTime) {
 
 			// gives a bit of air control
 			const speedDelta = deltaTime * (playerOnFloor ? 25 : 8);
+			
+			//비동기로 파워 레벨 올리는 콜백
+			const asyncLevelUpper = async () => {
+				await levelUpper();
+			}
+			//비동기로 파워 레벨 내리는 콜백
+			const asyncLevelDowner = async () => {
+				await levelDowner();
+			}
 
 			if (keyStates['KeyW']) {
 
@@ -334,6 +373,15 @@
 
 			}
 
+			//	방향키 위 키를 누르면 파워 올라감
+			if(keyStates['ArrowUp']) {
+				asyncLevelUpper();
+			}
+
+			// 방향키 아래 키를 누르면 파워 내려감
+			if(keyStates['ArrowDown']) {
+				asyncLevelDowner();
+			}
 		}
 
 		const loader = new GLTFLoader().setPath('../three.js-master/examples/models/gltf/');
