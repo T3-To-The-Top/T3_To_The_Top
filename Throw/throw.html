@@ -13,15 +13,15 @@
 			z-index: 1;
 			position: absolute;
 			top: 50%;
+			left: 80%;
+			rotate: -90deg;
 		}
 	</style>
 </head>
 
 <body style="overflow-y:hidden">
 	<div id="info" style="width: 100%; height: 5rem; text-align: center;">
-		0
-		<progress id = "powerLevel" value="1" max="2" style="width:50%; height: inherit;"></progress>
-		2
+		<progress id = "powerLevel" value="1" max="2" style="width:30%; height: inherit;"></progress>
 	</div>
 	<div id="container"></div>
 	<!-- Import maps polyfill -->
@@ -141,15 +141,6 @@
 		const vector2 = new THREE.Vector3();
 		const vector3 = new THREE.Vector3();
 
-
-		//Box 생성
-		var objects = new RandomObjectGeneration(2, 5,-5, 5, 5, 2);
-
-		//씬에 추가
-		scene.add(objects.floor);
-
-		//충돌판정을 추가
-		worldOctree.fromGraphNode(objects.floor);
 		
 
 		var ballPower = 1;
@@ -391,48 +382,48 @@
 			}
 		}
 
-		//기존 맵
-		const loader = new GLTFLoader().setPath('../three.js-master/examples/models/gltf/');
 
-		loader.load('collision-world.glb', (gltf) => {
+		//Box 생성
+		var objects_floor = new RandomObjectGeneration(0, 0, 0, 100, 0, 100,"../water.jpg");
 
-			scene.add(gltf.scene);
+		var objects_box1 = new RandomObjectGeneration(0, 10, 0, 5, 5, 5);
+		var objects_box2 = new RandomObjectGeneration(10, 20, 0, 5, 5, 5);
+		var objects_box3 = new RandomObjectGeneration(-10, 40, 0, 5, 5, 5);
+		var objects_box4 = new RandomObjectGeneration(0, 50, 20, 5, 5, 5);
+		var objects_box5 = new RandomObjectGeneration(0, 70, -10, 5, 5, 5);
 
-			worldOctree.fromGraphNode(gltf.scene);
 
-			gltf.scene.traverse(child => {
+		//씬에 추가
+		scene.add(objects_floor.floor);
+		scene.add(objects_box1.floor);
+		scene.add(objects_box2.floor);
+		scene.add(objects_box3.floor);
+		scene.add(objects_box4.floor);
+		scene.add(objects_box5.floor);
 
-				if (child.isMesh) {
+		//충돌판정을 추가
+		worldOctree.fromGraphNode(objects_floor.floor);
+		worldOctree.fromGraphNode(objects_box1.floor);
+		worldOctree.fromGraphNode(objects_box2.floor);
+		worldOctree.fromGraphNode(objects_box3.floor);
+		worldOctree.fromGraphNode(objects_box4.floor);
+		worldOctree.fromGraphNode(objects_box5.floor);
 
-					child.castShadow = true;
-					child.receiveShadow = true;
+		const helper = new OctreeHelper(worldOctree);
+		helper.visible = false;
+		scene.add(helper);
 
-					if (child.material.map) {
+		const gui = new GUI({ width: 200 });
+		gui.add({ debug: false }, 'debug')
+			.onChange(function (value) {
 
-						child.material.map.anisotropy = 4;
-
-					}
-
-				}
+				helper.visible = value;
 
 			});
 
-			const helper = new OctreeHelper(worldOctree);
-			helper.visible = false;
-			scene.add(helper);
+		animate();
 
-			const gui = new GUI({ width: 200 });
-			gui.add({ debug: false }, 'debug')
-				.onChange(function (value) {
-
-					helper.visible = value;
-
-				});
-
-			animate();
-
-		});
-
+		
 		function teleportPlayerIfOob() {
 
 			if (camera.position.y <= - 25) {
