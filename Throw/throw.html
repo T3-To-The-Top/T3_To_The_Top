@@ -44,19 +44,14 @@
 	<script type="module">
 
 		import * as THREE from 'three';
-
 		import Stats from 'three/addons/libs/stats.module.js';
-
 		import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-
 		import { Octree } from 'three/addons/math/Octree.js';
 		import { OctreeHelper } from 'three/addons/helpers/OctreeHelper.js';
-
 		import { Capsule } from 'three/addons/math/Capsule.js';
-
 		import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 		import { RandomObjectGeneration } from "../Random_object_generation.module.js";
-
+		import { EndSphere } from "../End_sphere.module.js"
 		const clock = new THREE.Clock();
 
 		const scene = new THREE.Scene();
@@ -140,45 +135,44 @@
 		const vector1 = new THREE.Vector3();
 		const vector2 = new THREE.Vector3();
 		const vector3 = new THREE.Vector3();
-
 		
-
 		var ballPower = 1;
 
-		document.addEventListener('keydown', (event) => {
+		const end_radius = 2;
+		const end_x = 3;
+		const end_y = 3;
+		const end_z = 2;
 
+		let destination_x = 1;
+		let destination_y = 1;
+		let destination_z = 1;
+		let destination_scale_x = 1;
+		let destination_scale_y = 1;
+		let destination_scale_z = 1;
+
+		document.addEventListener('keydown', (event) => {
 			console.log(event.code);
 			keyStates[event.code] = true;
-
 		});
 
 		document.addEventListener('keyup', (event) => {
-
 			keyStates[event.code] = false;
-
 		});
 
 		container.addEventListener('mousedown', () => {
-
 			document.body.requestPointerLock();
-
 			mouseTime = performance.now();
-
 		});
 
 		document.addEventListener('mouseup', () => {
-
 			if (document.pointerLockElement !== null) throwBall();
-
 		});
 
 		document.body.addEventListener('mousemove', (event) => {
 
 			if (document.pointerLockElement === document.body) {
-
 				camera.rotation.y -= event.movementX / 500;
 				camera.rotation.x -= event.movementY / 500;
-
 			}
 
 		});
@@ -189,7 +183,6 @@
 
 			camera.aspect = window.innerWidth / window.innerHeight;
 			camera.updateProjectionMatrix();
-
 			renderer.setSize(window.innerWidth, window.innerHeight);
 
 		}
@@ -204,7 +197,7 @@
 
 			// throw the ball with more force if we hold the button longer, and if we move forward
 
-			//기존 던지는 코드에 파워를 곱해버려서 속도 조절
+			// 기존 던지는 코드에 파워를 곱해버려서 속도 조절
 			const impulse = 15 + 30 * (1 - Math.exp((mouseTime - performance.now()) * 0.001)) * ballPower;
 
 			sphere.velocity.copy(playerDirection).multiplyScalar(impulse);
@@ -221,12 +214,35 @@
 			if (result) {
 
 				playerOnFloor = result.normal.y > 0;
+				let finish = false; // 게임 종료 변수
 
+				//플레이어가 공중에 떠있을때
 				if (!playerOnFloor) {
-
 					playerVelocity.addScaledVector(result.normal, - result.normal.dot(playerVelocity));
+				}
+
+				//플레이어가 아직 도착지에 도착 못했을때
+				if(!finish){
+					//도착지 구체의 중심을 중심으로 반지름 + 1을 반지름으로하는 구의 방정식 (충돌 체크)
+					let inRange = Math.pow(playerCollider.start.x - end.position.x, 2) + 
+									Math.pow(playerCollider.start.y - end.position.y, 2) + 
+									Math.pow(playerCollider.start.z - end.position.z, 2) <= Math.pow(end_radius + 1, 2);
+
+					console.log(inRange);
+					
+					if(inRange) { // 플레이어가 도착지 범위 내에 있다면 (도착지 충돌)
+						console.log("도착");
+					}
 
 				}
+
+				/* Todo
+				if(게임 중){
+					if(도착지 충돌){
+						게임 종료
+					}
+				}
+				*/
 
 				playerCollider.translate(result.normal.multiplyScalar(result.depth));
 
@@ -252,15 +268,12 @@
 			const deltaPosition = playerVelocity.clone().multiplyScalar(deltaTime);
 			playerCollider.translate(deltaPosition);
 			
-
 			playerCollisions();
-
 			camera.position.copy(playerCollider.end);
 
 		}
 
 		function updateSpheres(deltaTime) {
-
 
 			portal.collider.center.addScaledVector(portal.velocity, deltaTime);
 
@@ -282,9 +295,7 @@
 				console.log(portal.collider.center.x,portal.collider.center.y,portal.collider.center.z);
 
 			} else {
-
 				portal.velocity.y -= GRAVITY * deltaTime;
-
 			}
 
 			const damping = Math.exp(- 1.5 * deltaTime) - 1;
@@ -315,21 +326,17 @@
 
 		}
 
-		//파워 레벨 올리는 로직
+		// 파워 레벨 올리는 로직
 		function levelUpper(){
 			var powerLevel = document.querySelector("#powerLevel");
-			console.log(powerLevel);
 			if(ballPower < 2) ballPower = ballPower + 0.01;
-
 			powerLevel.value = ballPower;
 		}
 
-		//파워레벨 내리는 로직
+		// 파워 레벨 내리는 로직
 		function levelDowner(){
 			var powerLevel = document.querySelector("#powerLevel");
-			
 			if(ballPower > 0) ballPower = ballPower - 0.01;
-
 			powerLevel.value = ballPower;
 		}
 
@@ -338,40 +345,33 @@
 			// gives a bit of air control
 			const speedDelta = deltaTime * (playerOnFloor ? 25 : 8);
 			
-			//비동기로 파워 레벨 올리는 콜백
+			// 비동기로 파워 레벨 올리는 콜백
 			const asyncLevelUpper = async () => {
 				await levelUpper();
 			}
-			//비동기로 파워 레벨 내리는 콜백
+			
+			// 비동기로 파워 레벨 내리는 콜백
 			const asyncLevelDowner = async () => {
 				await levelDowner();
 			}
 
 			if (keyStates['KeyW']) {
-
 				playerVelocity.add(getForwardVector().multiplyScalar(speedDelta));
-
 			}
 
 			if (keyStates['KeyS']) {
-
 				playerVelocity.add(getForwardVector().multiplyScalar(- speedDelta));
-
 			}
 
 			if (keyStates['KeyA']) {
-
 				playerVelocity.add(getSideVector().multiplyScalar(- speedDelta));
-
 			}
 
 			if (keyStates['KeyD']) {
-
 				playerVelocity.add(getSideVector().multiplyScalar(speedDelta));
-
 			}
 
-			//	방향키 위 키를 누르면 파워 올라감
+			// 방향키 위 키를 누르면 파워 올라감
 			if(keyStates['ArrowUp']) {
 				asyncLevelUpper();
 			}
@@ -383,7 +383,7 @@
 		}
 
 
-		//Box 생성
+		// Box 생성
 		var objects_floor = new RandomObjectGeneration(0, 0, 0, 100, 0, 100,"../water.jpg");
 
 		var objects_box1 = new RandomObjectGeneration(0, 10, 0, 5, 5, 5);
@@ -392,22 +392,25 @@
 		var objects_box4 = new RandomObjectGeneration(0, 50, 20, 5, 5, 5);
 		var objects_box5 = new RandomObjectGeneration(0, 70, -10, 5, 5, 5);
 
-
-		//씬에 추가
+		//도착지 구체 Creation
+		const end = new EndSphere(end_radius, end_x, end_y, end_z).end;
+		// 씬에 추가
 		scene.add(objects_floor.floor);
 		scene.add(objects_box1.floor);
 		scene.add(objects_box2.floor);
 		scene.add(objects_box3.floor);
 		scene.add(objects_box4.floor);
 		scene.add(objects_box5.floor);
+		scene.add(end);
 
-		//충돌판정을 추가
+		// 충돌 판정 추가
 		worldOctree.fromGraphNode(objects_floor.floor);
 		worldOctree.fromGraphNode(objects_box1.floor);
 		worldOctree.fromGraphNode(objects_box2.floor);
 		worldOctree.fromGraphNode(objects_box3.floor);
 		worldOctree.fromGraphNode(objects_box4.floor);
 		worldOctree.fromGraphNode(objects_box5.floor);
+		worldOctree.fromGraphNode(end);
 
 		const helper = new OctreeHelper(worldOctree);
 		helper.visible = false;
@@ -416,9 +419,7 @@
 		const gui = new GUI({ width: 200 });
 		gui.add({ debug: false }, 'debug')
 			.onChange(function (value) {
-
 				helper.visible = value;
-
 			});
 
 		animate();
@@ -449,11 +450,8 @@
 			for (let i = 0; i < STEPS_PER_FRAME; i++) {
 
 				controls(deltaTime);
-
 				updatePlayer(deltaTime);
-
 				updateSpheres(deltaTime);
-
 				teleportPlayerIfOob();
 
 			}
