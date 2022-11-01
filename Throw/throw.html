@@ -266,7 +266,7 @@
 					console.log(page_open);
 
 					sprite.visible= true;
-					sprite.position.copy(camera.position)
+					sprite.position.copy(camera.position) // 공중에 떠있을때 보여주고
 
 				}
 
@@ -280,7 +280,7 @@
 				if(page_open){
 					page_open = false;
 					console.log(page_open);
-					sprite.visible= false;
+					sprite.visible= false; // 땅에 닿으면 안보이게
 
 				}
 			}
