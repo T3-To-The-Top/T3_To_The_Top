@@ -51,7 +51,7 @@
 		import { Capsule } from 'three/addons/math/Capsule.js';
 		import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 		import { RandomObjectGeneration } from "../Random_object_generation.module.js";
-
+		import { EndSphere } from "../End_sphere.module.js"
 		const clock = new THREE.Clock();
 
 		const scene = new THREE.Scene();
@@ -138,6 +138,11 @@
 		
 		var ballPower = 1;
 
+		const end_radius = 2;
+		const end_x = 3;
+		const end_y = 3;
+		const end_z = 2;
+
 		let destination_x = 1;
 		let destination_y = 1;
 		let destination_z = 1;
@@ -211,17 +216,20 @@
 				playerOnFloor = result.normal.y > 0;
 				let finish = false; // 게임 종료 변수
 
+				//플레이어가 공중에 떠있을때
 				if (!playerOnFloor) {
 					playerVelocity.addScaledVector(result.normal, - result.normal.dot(playerVelocity));
 				}
 
+				//플레이어가 아직 도착지에 도착 못했을때
 				if(!finish){
-					let inRange = Math.pow(playerDirection.x - destination_x/2, 2) + Math.pow(playerDirection.y - destination_y/2, 2) + Math.pow(playerDirection.z - destination_z/2, 2) <= Math.pow(destination_scale_x/2, 2) + Math.pow(destination_scale_y/2, 2) + Math.pow(destination_scale_z/2, 2);
-					// let inRange = Math.pow(result.normal.x - destination_x, 2) + Math.pow(result.normal.y - destination_y, 2) + Math.pow(result.normal.z - destination_z, 2) <= 1 + 1 + 1;
+					//도착지 구체의 중심을 중심으로 반지름 + 1을 반지름으로하는 구의 방정식 (충돌 체크)
+					let inRange = Math.pow(playerCollider.start.x - end.position.x, 2) + 
+									Math.pow(playerCollider.start.y - end.position.y, 2) + 
+									Math.pow(playerCollider.start.z - end.position.z, 2) <= Math.pow(end_radius + 1, 2);
 
 					console.log(inRange);
-					console.log(playerDirection.x, playerDirection.y, playerDirection.z);
-
+					
 					if(inRange) { // 플레이어가 도착지 범위 내에 있다면 (도착지 충돌)
 						console.log("도착");
 					}
@@ -384,9 +392,8 @@
 		var objects_box4 = new RandomObjectGeneration(0, 50, 20, 5, 5, 5);
 		var objects_box5 = new RandomObjectGeneration(0, 70, -10, 5, 5, 5);
 
-		var destination = new RandomObjectGeneration(destination_x, destination_y, destination_z, 0.2, 0.2, 0.2);
-
-
+		//도착지 구체 Creation
+		const end = new EndSphere(end_radius, end_x, end_y, end_z).end;
 		// 씬에 추가
 		scene.add(objects_floor.floor);
 		scene.add(objects_box1.floor);
@@ -394,8 +401,7 @@
 		scene.add(objects_box3.floor);
 		scene.add(objects_box4.floor);
 		scene.add(objects_box5.floor);
-
-		scene.add(destination.floor);
+		scene.add(end);
 
 		// 충돌 판정 추가
 		worldOctree.fromGraphNode(objects_floor.floor);
@@ -404,8 +410,7 @@
 		worldOctree.fromGraphNode(objects_box3.floor);
 		worldOctree.fromGraphNode(objects_box4.floor);
 		worldOctree.fromGraphNode(objects_box5.floor);
-
-		worldOctree.fromGraphNode(destination.floor);
+		worldOctree.fromGraphNode(end);
 
 		const helper = new OctreeHelper(worldOctree);
 		helper.visible = false;
