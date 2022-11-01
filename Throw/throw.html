@@ -19,10 +19,9 @@
 
 <body style="overflow-y:hidden">
 	<div id="info" style="width: 100%; height: 5rem; text-align: center;">
-		0
 		<progress id = "powerLevel" value="1" max="2" style="width:50%; height: inherit;"></progress>
-		2
 	</div>
+
 	<div id="container"></div>
 	<!-- Import maps polyfill -->
 	<!-- Remove this when import maps will be widely supported -->
@@ -141,6 +140,17 @@
 		const vector2 = new THREE.Vector3();
 		const vector3 = new THREE.Vector3();
 
+		//빡침 유발 장치 추가.
+		let page_open = false;
+
+		const you_suck = new THREE.TextureLoader().load( '../IMG/suck.jpeg' );
+		const material = new THREE.SpriteMaterial( { map: you_suck } );
+
+		const sprite = new THREE.Sprite( material );
+
+		sprite.visible = false;
+
+		scene.add(sprite);
 
 		//Box 생성
 		var objects = new RandomObjectGeneration(2, 5,-5, 5, 5, 2);
@@ -251,9 +261,28 @@
 
 				playerVelocity.y -= GRAVITY * deltaTime;
 
+				if(!page_open){
+					page_open = true;
+					console.log(page_open);
+
+					sprite.visible= true;
+					sprite.position.copy(camera.position)
+
+				}
+
 				// small air resistance
 				damping *= 0.1;
 
+			}
+
+			if(playerOnFloor){
+
+				if(page_open){
+					page_open = false;
+					console.log(page_open);
+					sprite.visible= false;
+
+				}
 			}
 
 			playerVelocity.addScaledVector(playerVelocity, damping);
@@ -286,7 +315,6 @@
 				playerCollider.end.set(portal.collider.center.x,portal.collider.center.y+1,portal.collider.center.z);
 				playerCollider.radius = 0.35;
 				camera.position.copy(playerCollider.end);
-				camera.rotation.set(0, 0, 0);
 				
 				console.log(portal.collider.center.x,portal.collider.center.y,portal.collider.center.z);
 

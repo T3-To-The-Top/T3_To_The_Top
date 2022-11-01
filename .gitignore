@@ -15,6 +15,7 @@
 
 pkg/
 src/
+node_modules/
 
 ### macOS ###
 # General
@@ -24,7 +25,8 @@ src/
 
 # Icon must end with two \r
 Icon
-
+package-lock.json
+package.json
 
 # Thumbnails
 ._*
@@ -98,5 +100,6 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+
 
 # End of https://www.toptal.com/developers/gitignore/api/macos,archlinuxpackages,windows,visualstudiocode
