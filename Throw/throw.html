@@ -18,6 +18,8 @@
 		}
 	</style>
 </head>
+<body>
+</head>
 
 <body style="overflow-y:hidden">
 	<div id="info" style="width: 100%; height: 5rem; text-align: center;">
@@ -384,13 +386,13 @@
 
 
 		//Box 생성
-		var objects_floor = new RandomObjectGeneration(0, 0, 0, 100, 0, 100,"../water.jpg");
+		var objects_floor = new RandomObjectGeneration(0, 0, 0, 100, 0, 100,"../Sand_texture.jpg");
 
-		var objects_box1 = new RandomObjectGeneration(0, 10, 0, 5, 5, 5);
-		var objects_box2 = new RandomObjectGeneration(10, 20, 0, 5, 5, 5);
-		var objects_box3 = new RandomObjectGeneration(-10, 40, 0, 5, 5, 5);
-		var objects_box4 = new RandomObjectGeneration(0, 50, 20, 5, 5, 5);
-		var objects_box5 = new RandomObjectGeneration(0, 70, -10, 5, 5, 5);
+		var objects_box1 = new RandomObjectGeneration(0, 10, 0, 5, 5, 5,"../Cloud_texture.jpg");
+		var objects_box2 = new RandomObjectGeneration(10, 20, 0, 5, 5, 5,"../Cloud_texture.jpg");
+		var objects_box3 = new RandomObjectGeneration(-10, 40, 0, 5, 5, 5,"../Cloud_texture.jpg");
+		var objects_box4 = new RandomObjectGeneration(0, 50, 20, 5, 5, 5,"../Cloud_texture.jpg");
+		var objects_box5 = new RandomObjectGeneration(0, 70, -10, 5, 5, 5,"../Cloud_texture.jpg");
 
 
 		//씬에 추가
@@ -422,7 +424,6 @@
 			});
 
 		animate();
-
 		
 		function teleportPlayerIfOob() {
 
