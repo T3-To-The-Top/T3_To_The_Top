@@ -90,8 +90,8 @@
 		const clock = new THREE.Clock();
 
 		const scene = new THREE.Scene();
-		scene.background = new THREE.Color(0x88ccee);
-		scene.fog = new THREE.Fog(0x88ccee, 0, 50);
+		scene.background = new THREE.Color(0x2c2b2b);
+		scene.fog = new THREE.Fog(0x2c2b2b, 0, 50);
 
 		const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000);
 		camera.rotation.order = 'YXZ';
@@ -402,13 +402,13 @@
 
 
 		// Box 생성
-		var objects_floor = new RandomObjectGeneration(0, 0, 0, 100, 0, 100,"../water.jpg");
+		var objects_floor = new RandomObjectGeneration(0, 0, 0, 100, 0, 100,"../lava.jpg");
 
-		var objects_box1 = new RandomObjectGeneration(0, 10, 0, 5, 5, 5);
-		var objects_box2 = new RandomObjectGeneration(10, 20, 0, 5, 5, 5);
-		var objects_box3 = new RandomObjectGeneration(-10, 40, 0, 5, 5, 5);
-		var objects_box4 = new RandomObjectGeneration(0, 50, 20, 5, 5, 5);
-		var objects_box5 = new RandomObjectGeneration(0, 70, -10, 5, 5, 5);
+		var objects_box1 = new RandomObjectGeneration(0, 10, 0, 5, 5, 5, "../opsidian.jpg");
+		var objects_box2 = new RandomObjectGeneration(10, 20, 0, 5, 5, 5, "../opsidian.jpg");
+		var objects_box3 = new RandomObjectGeneration(-10, 40, 0, 5, 5, 5, "../opsidian.jpg");
+		var objects_box4 = new RandomObjectGeneration(0, 50, 20, 5, 5, 5, "../opsidian.jpg");
+		var objects_box5 = new RandomObjectGeneration(0, 70, -10, 5, 5, 5, "../opsidian.jpg");
 
 		//도착지 구체 Creation
 		const end = new EndSphere(end_radius, end_x, end_y, end_z).end;
@@ -420,6 +420,7 @@
 		scene.add(objects_box4.floor);
 		scene.add(objects_box5.floor);
 		scene.add(end);
+
 
 		// 충돌 판정 추가
 		worldOctree.fromGraphNode(objects_floor.floor);
@@ -459,11 +460,13 @@
 			camera.rotation.set(0, 0, 0);
 		}
 
-
 		function animate() {
 
 			const deltaTime = Math.min(0.05, clock.getDelta()) / STEPS_PER_FRAME;
-
+			
+			step += 0.01;
+			objects_box1.floor.position.y = 3 + ( 5 + Math.abs(Math.sin(step)));
+	}
 			// we look for collisions in substeps to mitigate the risk of
 			// an object traversing another too quickly for detection.
 
@@ -476,13 +479,10 @@
 
 			}
 
+			requestAnimationFrame(animate);
 			renderer.render(scene, camera);
 
 			stats.update();
-
-			requestAnimationFrame(animate);
-
-		}
 
 	</script>
 </body>
