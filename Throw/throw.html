@@ -16,22 +16,27 @@
 			left: 80%;
 			rotate: -90deg;
 		}
-		.dialog{
+
+		#blocker {
 			position: absolute;
-			left: 0;
-			top: 0;
-			right: 0;
-			bottom: 0;
-		}
-		#clear{
-			position: absolute;
+			width: 100%;
+			height: 100%;
 			visibility: hidden;
-			color: red;
-			font-size: 400px;
-			top: 30%;
-			left: 30%;
+			background-color: rgba(0,0,0,0.5);
 			z-index: 2;
 		}
+		#instructions {
+			width: 100%;
+			height: 100%;
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			align-items: center;
+			text-align: center;
+			font-size: 14px;
+			cursor: pointer;
+		}
+
 	</style>
 </head>
 
@@ -39,12 +44,20 @@
 	<div id="info" style="width: 100%; height: 5rem; text-align: center;">
 		<progress id = "powerLevel" value="1" max="2" style="width:30%; height: inherit;"></progress>
 	</div>
-	<div id="container">
-		<div class="dialog">
-			<div id="clear">
+
+	<!-- 종료 페이지 -->
+	<div id="blocker">
+		<div id="instructions">
+			<p style="font-size:100px">
 				Clear
-			</div>
+			</p>
+			<p style="font-size:24px">
+				If you want to play it again, please refresh
+			</p>
 		</div>
+	</div>
+	
+	<div id="container">
 	</div>
 	<!-- Import maps polyfill -->
 	<!-- Remove this when import maps will be widely supported -->
@@ -245,12 +258,7 @@
 									Math.pow(playerCollider.start.z - end.position.z, 2) <= Math.pow(end_radius + 1, 2);
 					
 					if(inRange) { // 플레이어가 도착지 범위 내에 있다면 (도착지 충돌)
-						if(window.confirm("도착! 기록을 갱신하기 위해 다시 플레이 하시겠습니까?")){
-							init();
-						}
-						else {
-							document.getElementById("clear").style.visibility = "visible"
-						}
+						document.getElementById("blocker").style.visibility= "visible";
 					}
 				}
 
