@@ -4,6 +4,8 @@
 
 import * as THREE from '../three.js-master/build/three.module.js';
 
+var step = 0;
+
 export class RandomObjectGeneration {
 
     constructor(posX, posY, posZ, sizeX, sizeY, sizeZ, texture) {
@@ -22,6 +24,7 @@ export class RandomObjectGeneration {
         this.floor.position.x = posX;
         this.floor.position.y = posY;
         this.floor.position.z = posZ;
+		
 
         this.geometry1
         this.material1
