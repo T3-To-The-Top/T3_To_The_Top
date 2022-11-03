@@ -43,6 +43,21 @@ Server -
 <img src="https://img.shields.io/badge/Node.js-339933?style=flat-square&logo=Node.js&logoColor=white"/></a>
 <img src="https://img.shields.io/badge/Express-000000?style=flat-square&logo=Express&logoColor=white"/></a>
 
+## Project structure
+.</br>
+├── Curve_path.module.js</br>
+├── End_sphere.module.js</br>
+├── License</br>
+├── README.md</br>
+├── Random_object_generation.module.js</br>
+├── database.module.js</br>
+├── database_config.module.js</br>
+├── end.png</br>
+├── index.html -> main file</br>
+├── lava.jpg</br>
+├── opsidian.jpg</br>
+└── three.js-master -> three.js libaray</br>
+
 ## **Development environment**
 
 VSCode
