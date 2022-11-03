@@ -16,7 +16,7 @@ export class RandomObjectGeneration {
         this.loader = new THREE.TextureLoader();
         this.material = new THREE.MeshBasicMaterial({ map: this.loader.load(texture) });
 
-        // render를 하는 API이다.
+        // render를 하는 API이다. (매쉬 추가)
         this.floor = new THREE.Mesh(this.geometry, this.material);
 
         // 다 만들어놓은 애의 위치를 지정한다.

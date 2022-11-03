@@ -1,7 +1,8 @@
+/**
+ * Custom Curve Path module
+ * 사용하지 않음
+ */
 import * as THREE from './three.js-master/build/three.module.js';
-import { TransformControls } from '../three.js-master/examples/jsm/controls/TransformControls.js';
-import Stats from '../three.js-master/examples/jsm/libs/stats.module.js';
-import { Flow } from '../three.js-master/examples/jsm/modifiers/CurveModifier.js';
 
 export class CurvePathCustom {
     constructor(v1, v2, v3, colors) {
