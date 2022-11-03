@@ -10,7 +10,6 @@ export class RandomObjectGeneration {
 
     constructor(posX, posY, posZ, sizeX, sizeY, sizeZ, texture) {
 
-
         // BOX 만들고 크기 지정 -> Vertex
         this.geometry = new THREE.BoxGeometry(sizeX, sizeY, sizeZ);
         // 색깔 지정 -> Fragment
