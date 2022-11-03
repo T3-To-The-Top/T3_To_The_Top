@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>T3 - To The Top</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+    <style>
+        canvas {
+            position: relative;
+        }
+
+        progress {
+            z-index: 2;
+            position: absolute;
+            top: 50%;
+            left: 80%;
+            rotate: -90deg;
+        }
+
+        #blocker {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            visibility: hidden;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 2;
+        }
+
+        #instructions {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            font-size: 14px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body style="overflow-y:hidden">
+    <div id="info" style="width: 100%; height: 5rem; text-align: center;">
+		<progress id = "powerLevel" value="1" max="2" style="width:30%; height: inherit;"></progress>
+	</div>
+    <!-- 종료 페이지 -->
+    <div id="blocker">
+        <div id="instructions">
+            <p style="font-size:100px; color:white">
+                Clear
+            </p>
+            <p style="font-size:24px; color:white">
+                If you want to play it again, please refresh
+            </p>
+        </div>
+    </div>
+
+    <div id="container">
+    </div>
+    <!-- Three.js lib file import route-->
+    <script type="importmap">
+			{
+				"imports": {
+					"three": "./three.js-master/build/three.module.js",
+					"three/addons/": "./three.js-master/examples/jsm/"
+				}
+			}
+		</script>
+    
+    
+    <!-- Core game logic-->
+    <script type="module">
+
+        import * as THREE from 'three';
+        import Stats from 'three/addons/libs/stats.module.js';
+        import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+        import { Octree } from 'three/addons/math/Octree.js';
+        import { OctreeHelper } from 'three/addons/helpers/OctreeHelper.js';
+        import { Capsule } from 'three/addons/math/Capsule.js';
+        import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+        import { RandomObjectGeneration } from "./Random_object_generation.module.js";
+        import { EndSphere } from "./End_sphere.module.js"
+        //Timer clock init
+        const clock = new THREE.Clock();
+
+        //scene init and background init
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x2c2b2b);
+        scene.fog = new THREE.Fog(0x2c2b2b, 0, 50);
+
+        //camera init
+        const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.rotation.order = 'YXZ';
+
+        //light init
+        const fillLight1 = new THREE.HemisphereLight(0x4488bb, 0x002244, 0.5);
+        fillLight1.position.set(2, 1, 1);
+        scene.add(fillLight1);
+
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        directionalLight.position.set(- 5, 25, - 1);
+        directionalLight.castShadow = true;
+        directionalLight.shadow.camera.near = 0.01;
+        directionalLight.shadow.camera.far = 500;
+        directionalLight.shadow.camera.right = 30;
+        directionalLight.shadow.camera.left = - 30;
+        directionalLight.shadow.camera.top = 30;
+        directionalLight.shadow.camera.bottom = - 30;
+        directionalLight.shadow.mapSize.width = 1024;
+        directionalLight.shadow.mapSize.height = 1024;
+        directionalLight.shadow.radius = 4;
+        directionalLight.shadow.bias = - 0.00006;
+        scene.add(directionalLight);
+
+        //render init and attach logic to html
+        const container = document.getElementById('container');
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.VSMShadowMap;
+        renderer.outputEncoding = THREE.sRGBEncoding;
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        container.appendChild(renderer.domElement);
+
+        const stats = new Stats();
+        stats.domElement.style.position = 'absolute';
+        stats.domElement.style.top = '0px';
+        container.appendChild(stats.domElement);
+
+        //Constants
+        const GRAVITY = 30;
+
+        const NUM_SPHERES = 100;
+        const SPHERE_RADIUS = 0.2;
+
+        const STEPS_PER_FRAME = 5;
+
+        // Throwed sphere init
+        const sphereGeometry = new THREE.IcosahedronGeometry(SPHERE_RADIUS, 5);
+        const sphereMaterial = new THREE.MeshLambertMaterial({ color: 0xbbbb44 });
+        const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+        sphere.castShadow = true;
+        sphere.receiveShadow = true;
+        scene.add(sphere);
+
+        // Trowed potal init
+        var portal;
+        portal = {
+            mesh: sphere,
+            collider: new THREE.Sphere(new THREE.Vector3(0, - 100, 0), SPHERE_RADIUS),
+            velocity: new THREE.Vector3()
+        };
+
+        // map object tree
+        const worldOctree = new Octree();
+
+        // Player hit box
+        const playerCollider = new Capsule(new THREE.Vector3(0, 0.35, 0), new THREE.Vector3(0, 1, 0), 0.35);
+        //Player move init
+        const playerVelocity = new THREE.Vector3();
+        const playerDirection = new THREE.Vector3();
+
+        let playerOnFloor = false; // check player is on floor
+        let mouseTime = 0;
+
+        const keyStates = {};
+
+        const vector1 = new THREE.Vector3();
+        const vector2 = new THREE.Vector3();
+        const vector3 = new THREE.Vector3();
+
+        //Throwed ball power
+        var ballPower = 1;
+
+        // end exit sphere settting
+        const end_radius = 2;
+        const end_x = 0;
+        const end_y = 40;
+        const end_z = 0;
+
+        //Key setting and event setting
+        document.addEventListener('keydown', (event) => {
+            console.log(event.code);
+            keyStates[event.code] = true;
+        });
+
+        document.addEventListener('keyup', (event) => {
+            keyStates[event.code] = false;
+        });
+
+        container.addEventListener('mousedown', () => {
+            document.body.requestPointerLock();
+            mouseTime = performance.now();
+        });
+
+        document.addEventListener('mouseup', () => {
+            if (document.pointerLockElement !== null) throwBall();
+        });
+
+        document.body.addEventListener('mousemove', (event) => {
+
+            if (document.pointerLockElement === document.body) {
+                camera.rotation.y -= event.movementX / 500;
+                camera.rotation.x -= event.movementY / 500;
+            }
+
+        });
+
+        window.addEventListener('resize', onWindowResize);
+
+        function onWindowResize() {
+
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+
+        }
+
+        //Throw ball( potal ) function
+        function throwBall() {
+
+            const sphere = portal;
+
+            camera.getWorldDirection(playerDirection);
+
+            //colider ( hit box ) setting
+            sphere.collider.center.copy(playerCollider.end).addScaledVector(playerDirection, playerCollider.radius * 1.5);
+
+            // throw the ball with more force if we hold the button longer, and if we move forward
+
+            // 기존 던지는 코드에 파워를 곱해버려서 속도 조절
+            const impulse = 15 + 30 * (1 - Math.exp((mouseTime - performance.now()) * 0.001)) * ballPower;
+
+            //moving velocity setting
+            sphere.velocity.copy(playerDirection).multiplyScalar(impulse);
+            sphere.velocity.addScaledVector(playerVelocity, 2);
+
+        }
+
+        function playerCollisions() {
+
+            const result = worldOctree.capsuleIntersect(playerCollider);
+
+            playerOnFloor = false;
+
+            if (result) {
+
+                playerOnFloor = result.normal.y > 0;
+                let finish = false; // 게임 종료 변수
+
+                // 플레이어가 공중에 떠있을때
+                if (!playerOnFloor) {
+                    playerVelocity.addScaledVector(result.normal, - result.normal.dot(playerVelocity));
+                }
+
+                // 플레이어가 아직 도착지에 도착 못했을때
+                if (!finish) {
+
+                    // 도착지 구체의 중심을 중심으로 반지름 + 1을 반지름으로하는 구의 방정식 (충돌 체크)
+                    let inRange = Math.pow(playerCollider.start.x - end.position.x, 2) +
+                        Math.pow(playerCollider.start.y - end.position.y, 2) +
+                        Math.pow(playerCollider.start.z - end.position.z, 2) <= Math.pow(end_radius + 1, 2);
+
+                    if (inRange) { // 플레이어가 도착지 범위 내에 있다면 (도착지 충돌)
+                        document.getElementById("blocker").style.visibility = "visible";
+                    }
+                }
+
+                playerCollider.translate(result.normal.multiplyScalar(result.depth));
+
+            }
+
+        }
+
+        //check player moving or standing
+        function updatePlayer(deltaTime) {
+
+            let damping = Math.exp(- 4 * deltaTime) - 1;
+
+            //if player not on floor ( 공중에 떠있다면 )
+            if (!playerOnFloor) {
+
+                playerVelocity.y -= GRAVITY * deltaTime;
+
+                // small air resistance
+                damping *= 0.1;
+
+            }
+
+            playerVelocity.addScaledVector(playerVelocity, damping);
+
+            const deltaPosition = playerVelocity.clone().multiplyScalar(deltaTime);
+            playerCollider.translate(deltaPosition);
+
+            playerCollisions();
+            camera.position.copy(playerCollider.end);
+
+        }
+
+        function updateSpheres(deltaTime) {
+
+            portal.collider.center.addScaledVector(portal.velocity, deltaTime);
+
+            const result = worldOctree.sphereIntersect(portal.collider);
+
+            if (result) {
+
+                portal.velocity.addScaledVector(result.normal, - result.normal.dot(portal.velocity) * 1.5);
+                portal.collider.center.add(result.normal.multiplyScalar(result.depth));
+
+                portal.velocity.addScaledVector(new THREE.Vector3(0, 0, 0));
+
+                playerCollider.start.set(portal.collider.center.x, portal.collider.center.y + 0.35, portal.collider.center.z);
+                playerCollider.end.set(portal.collider.center.x, portal.collider.center.y + 1, portal.collider.center.z);
+                playerCollider.radius = 0.35;
+                camera.position.copy(playerCollider.end);
+                camera.rotation.set(0, 0, 0);
+
+                console.log(portal.collider.center.x, portal.collider.center.y, portal.collider.center.z);
+
+            } else {
+                portal.velocity.y -= GRAVITY * deltaTime;
+            }
+
+            const damping = Math.exp(- 1.5 * deltaTime) - 1;
+            portal.velocity.addScaledVector(portal.velocity, damping);
+
+            portal.mesh.position.copy(portal.collider.center);
+
+        }
+
+        function getForwardVector() {
+
+            camera.getWorldDirection(playerDirection);
+            playerDirection.y = 0;
+            playerDirection.normalize();
+
+            return playerDirection;
+
+        }
+
+        function getSideVector() {
+
+            camera.getWorldDirection(playerDirection);
+            playerDirection.y = 0;
+            playerDirection.normalize();
+            playerDirection.cross(camera.up);
+
+            return playerDirection;
+
+        }
+
+        // 파워 레벨 올리는 로직
+        function levelUpper() {
+            var powerLevel = document.querySelector("#powerLevel");
+            if (ballPower < 2) ballPower = ballPower + 0.001;
+            powerLevel.value = ballPower;
+        }
+
+        // 파워 레벨 내리는 로직
+        function levelDowner() {
+            var powerLevel = document.querySelector("#powerLevel");
+            if (ballPower > 0) ballPower = ballPower - 0.001;
+            powerLevel.value = ballPower;
+        }
+
+        function controls(deltaTime) {
+
+            // gives a bit of air control
+            const speedDelta = deltaTime * (playerOnFloor ? 25 : 8);
+
+            // 비동기로 파워 레벨 올리는 콜백
+            const asyncLevelUpper = async () => {
+                await levelUpper();
+            }
+
+            // 비동기로 파워 레벨 내리는 콜백
+            const asyncLevelDowner = async () => {
+                await levelDowner();
+            }
+
+            //key down logic
+            if (keyStates['KeyW']) {
+                playerVelocity.add(getForwardVector().multiplyScalar(speedDelta));
+            }
+
+            if (keyStates['KeyS']) {
+                playerVelocity.add(getForwardVector().multiplyScalar(- speedDelta));
+            }
+
+            if (keyStates['KeyA']) {
+                playerVelocity.add(getSideVector().multiplyScalar(- speedDelta));
+            }
+
+            if (keyStates['KeyD']) {
+                playerVelocity.add(getSideVector().multiplyScalar(speedDelta));
+            }
+
+            // 방향키 위 키를 누르면 파워 올라감
+            if (keyStates['ArrowUp']) {
+                asyncLevelUpper();
+            }
+
+            // 방향키 아래 키를 누르면 파워 내려감
+            if (keyStates['ArrowDown']) {
+                asyncLevelDowner();
+            }
+        }
+
+
+        // Box 생성
+        var objects_floor = new RandomObjectGeneration(0, 0, 0, 100, 0, 100, "./lava.jpg");
+        // x : 34 ~ 50
+        var objects_box1 = new RandomObjectGeneration(37, 15, 25, 3, 3, 3, "./opsidian.jpg");
+        var objects_box2 = new RandomObjectGeneration(44, 8, 15, 3, 3, 3, "./opsidian.jpg");
+        var objects_box3 = new RandomObjectGeneration(34, 22, 4, 3, 3, 3, "./opsidian.jpg");
+        var objects_box4 = new RandomObjectGeneration(49, 18, -11, 3, 3, 3, "./opsidian.jpg");
+        var objects_box5 = new RandomObjectGeneration(38, 28, -37, 3, 3, 3, "./opsidian.jpg");
+        // x : 17 ~ 33
+        var objects_box6 = new RandomObjectGeneration(17, 21, 7, 3, 3, 3, "./opsidian.jpg");
+        var objects_box7 = new RandomObjectGeneration(32, 16, 15, 3, 3, 3, "./opsidian.jpg");
+        var objects_box8 = new RandomObjectGeneration(26, 13, 26, 3, 3, 3, "./opsidian.jpg");
+        var objects_box9 = new RandomObjectGeneration(19, 24, -18, 3, 3, 3, "./opsidian.jpg");
+        var objects_box10 = new RandomObjectGeneration(28, 5, -22, 3, 3, 3, "./opsidian.jpg");
+        // x : 0 ~ 16
+        var objects_box11 = new RandomObjectGeneration(12, 6, -5, 3, 3, 3, "./opsidian.jpg");
+        var objects_box12 = new RandomObjectGeneration(4, 13, 15, 3, 3, 3, "./opsidian.jpg");
+        var objects_box13 = new RandomObjectGeneration(1, 23, 7, 3, 3, 3, "./opsidian.jpg");
+        var objects_box14 = new RandomObjectGeneration(15, 17, 31, 3, 3, 3, "./opsidian.jpg");
+        var objects_box15 = new RandomObjectGeneration(8, 28, -17, 3, 3, 3, "./opsidian.jpg");
+        // x : 0 ~ -16
+        var objects_box16 = new RandomObjectGeneration(-7, 9, 35, 3, 3, 3, "./opsidian.jpg");
+        var objects_box17 = new RandomObjectGeneration(-12, 25, -3, 3, 3, 3, "./opsidian.jpg");
+        var objects_box18 = new RandomObjectGeneration(-4, 16, 17, 3, 3, 3, "./opsidian.jpg");
+        var objects_box19 = new RandomObjectGeneration(-1, 22, -24, 3, 3, 3, "./opsidian.jpg");
+        var objects_box20 = new RandomObjectGeneration(-14, 12, -15, 3, 3, 3, "./opsidian.jpg");
+        // x : -17 ~ -33
+        var objects_box21 = new RandomObjectGeneration(-18, 24, 30, 3, 3, 3, "./opsidian.jpg");
+        var objects_box22 = new RandomObjectGeneration(-32, 5, -20, 3, 3, 3, "./opsidian.jpg");
+        var objects_box23 = new RandomObjectGeneration(-25, 17, -37, 3, 3, 3, "./opsidian.jpg");
+        var objects_box24 = new RandomObjectGeneration(-31, 22, 15, 3, 3, 3, "./opsidian.jpg");
+        var objects_box25 = new RandomObjectGeneration(-21, 28, 1, 3, 3, 3, "./opsidian.jpg");
+        // x : -34 ~ -50
+        var objects_box26 = new RandomObjectGeneration(-44, 9, 7, 3, 3, 3, "./opsidian.jpg");
+        var objects_box27 = new RandomObjectGeneration(-36, 21, -9, 3, 3, 3, "./opsidian.jpg");
+        var objects_box28 = new RandomObjectGeneration(-39, 11, 46, 3, 3, 3, "./opsidian.jpg");
+        var objects_box29 = new RandomObjectGeneration(-49, 25, -29, 3, 3, 3, "./opsidian.jpg");
+        var objects_box30 = new RandomObjectGeneration(-41, 18, -15, 3, 3, 3, "./opsidian.jpg");
+        //도착지 구체 Creationss
+        const end = new EndSphere(end_radius, end_x, end_y, end_z, "./lava.jpg").end;
+        // 씬에 추가
+        scene.add(objects_floor.floor);
+        scene.add(objects_box1.floor);
+        scene.add(objects_box2.floor);
+        scene.add(objects_box3.floor);
+        scene.add(objects_box4.floor);
+        scene.add(objects_box5.floor);
+        scene.add(objects_box6.floor);
+        scene.add(objects_box7.floor);
+        scene.add(objects_box8.floor);
+        scene.add(objects_box9.floor);
+        scene.add(objects_box10.floor);
+        scene.add(objects_box11.floor);
+        scene.add(objects_box12.floor);
+        scene.add(objects_box13.floor);
+        scene.add(objects_box14.floor);
+        scene.add(objects_box15.floor);
+        scene.add(objects_box16.floor);
+        scene.add(objects_box17.floor);
+        scene.add(objects_box18.floor);
+        scene.add(objects_box19.floor);
+        scene.add(objects_box20.floor);
+        scene.add(objects_box21.floor);
+        scene.add(objects_box22.floor);
+        scene.add(objects_box23.floor);
+        scene.add(objects_box24.floor);
+        scene.add(objects_box25.floor);
+        scene.add(objects_box26.floor);
+        scene.add(objects_box27.floor);
+        scene.add(objects_box28.floor);
+        scene.add(objects_box29.floor);
+        scene.add(objects_box30.floor);
+        scene.add(end);
+
+
+        // 충돌 판정 추가
+        worldOctree.fromGraphNode(objects_floor.floor);
+        worldOctree.fromGraphNode(objects_box1.floor);
+        worldOctree.fromGraphNode(objects_box2.floor);
+        worldOctree.fromGraphNode(objects_box3.floor);
+        worldOctree.fromGraphNode(objects_box4.floor);
+        worldOctree.fromGraphNode(objects_box5.floor);
+        worldOctree.fromGraphNode(objects_box6.floor);
+        worldOctree.fromGraphNode(objects_box7.floor);
+        worldOctree.fromGraphNode(objects_box8.floor);
+        worldOctree.fromGraphNode(objects_box9.floor);
+        worldOctree.fromGraphNode(objects_box10.floor);
+        worldOctree.fromGraphNode(objects_box11.floor);
+        worldOctree.fromGraphNode(objects_box12.floor);
+        worldOctree.fromGraphNode(objects_box13.floor);
+        worldOctree.fromGraphNode(objects_box14.floor);
+        worldOctree.fromGraphNode(objects_box15.floor);
+        worldOctree.fromGraphNode(objects_box16.floor);
+        worldOctree.fromGraphNode(objects_box17.floor);
+        worldOctree.fromGraphNode(objects_box18.floor);
+        worldOctree.fromGraphNode(objects_box19.floor);
+        worldOctree.fromGraphNode(objects_box20.floor);
+        worldOctree.fromGraphNode(objects_box21.floor);
+        worldOctree.fromGraphNode(objects_box22.floor);
+        worldOctree.fromGraphNode(objects_box23.floor);
+        worldOctree.fromGraphNode(objects_box24.floor);
+        worldOctree.fromGraphNode(objects_box25.floor);
+        worldOctree.fromGraphNode(objects_box26.floor);
+        worldOctree.fromGraphNode(objects_box27.floor);
+        worldOctree.fromGraphNode(objects_box28.floor);
+        worldOctree.fromGraphNode(objects_box29.floor);
+        worldOctree.fromGraphNode(objects_box30.floor);
+
+        worldOctree.fromGraphNode(end);
+
+        const helper = new OctreeHelper(worldOctree);
+        helper.visible = false;
+        scene.add(helper);
+
+        const gui = new GUI({ width: 200 });
+        gui.add({ debug: false }, 'debug')
+            .onChange(function (value) {
+                helper.visible = value;
+            });
+
+        animate();
+
+
+        function teleportPlayerIfOob() {
+
+            if (camera.position.y <= - 25) {
+                init();
+            }
+
+        }
+
+        function init() {
+            playerCollider.start.set(0, 0.35, 0);
+            playerCollider.end.set(0, 1, 0);
+            playerCollider.radius = 0.35;
+            camera.position.copy(playerCollider.end);
+            camera.rotation.set(0, 0, 0);
+        }
+
+        function animate() {
+
+            const deltaTime = Math.min(0.05, clock.getDelta()) / STEPS_PER_FRAME;
+
+            // we look for collisions in substeps to mitigate the risk of
+            // an object traversing another too quickly for detection.
+
+            for (let i = 0; i < STEPS_PER_FRAME; i++) {
+
+                controls(deltaTime);
+                updatePlayer(deltaTime);
+                updateSpheres(deltaTime);
+                teleportPlayerIfOob();
+
+            }
+
+            requestAnimationFrame(animate);
+            renderer.render(scene, camera);
+
+            stats.update();
+        }
+    </script>
+</body>
+
+</html>
