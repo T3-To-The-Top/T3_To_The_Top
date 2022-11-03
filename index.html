@@ -4,7 +4,7 @@
 <head>
     <title>T3 - To The Top</title>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+    <meta name="viewport" content="width=device-width, height=device-height,user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
     <style>
         canvas {
             position: relative;
@@ -42,9 +42,12 @@
 </head>
 
 <body style="overflow-y:hidden">
-    <div id="info" style="width: 100%; height: 5rem; text-align: center;">
-		<progress id = "powerLevel" value="1" max="2" style="width:30%; height: inherit;"></progress>
-	</div>
+    
+    <div style="position: absolute; top: 83%; left: 5%; font-size: xx-large; color: white; z-index: 1;">
+        <p>Move -> W : Forward / A: Left / S : Backward / D : Right </p>
+        <p>Throw potal -> Click mouse left button</p>
+        <p>Throw power -> &uarr; : Increase power / &darr; : Decrease power</p>
+    </div>
     <!-- 종료 페이지 -->
     <div id="blocker">
         <div id="instructions">
@@ -59,6 +62,9 @@
 
     <div id="container">
     </div>
+    <div id="info" style="width: 100%; height: 5rem; text-align: center;">
+		<progress id = "powerLevel" value="1" max="2" style="width:30%; height: inherit;"></progress>
+	</div>
     <!-- Three.js lib file import route-->
     <script type="importmap">
 			{
