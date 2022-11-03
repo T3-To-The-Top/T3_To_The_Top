@@ -60,7 +60,7 @@ Server -
 
 ## **Development environment**
 
-VSCode
+<img src="https://img.shields.io/badge/Visual Studio Code-007ACC?style=flat-square&logo=Visual Studio Code&logoColor=white"/></a>
 
 ## Lisence
 
