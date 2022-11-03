@@ -31,7 +31,7 @@ Han soo min - WGNW_gangdodan
 
 ## Used library
 
-Three.js
+<img src="https://img.shields.io/badge/Three.js-000000?style=flat-square&logo=Three.js&logoColor=white"/></a>
 
 ## Used tech stack
 
