@@ -24,9 +24,5 @@ export class RandomObjectGeneration {
         this.floor.position.y = posY;
         this.floor.position.z = posZ;
 		
-
-        this.geometry1
-        this.material1
-        this.end
     }
 }

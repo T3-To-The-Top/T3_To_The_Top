@@ -270,6 +270,7 @@
                     }
                 }
 
+                // Player hit box translate
                 playerCollider.translate(result.normal.multiplyScalar(result.depth));
 
             }
@@ -543,6 +544,7 @@
 
         }
 
+        //initialize programß
         function init() {
             playerCollider.start.set(0, 0.35, 0);
             playerCollider.end.set(0, 1, 0);
@@ -551,6 +553,7 @@
             camera.rotation.set(0, 0, 0);
         }
 
+        //animation logic
         function animate() {
 
             const deltaTime = Math.min(0.05, clock.getDelta()) / STEPS_PER_FRAME;
