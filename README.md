@@ -20,7 +20,7 @@ If the ball hits an object, it will move to that object.
 
 ## You can play in here
 
-link
+https://www.wgnw.monster/
 
 ## Developer
 
