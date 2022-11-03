@@ -120,6 +120,19 @@
         directionalLight.shadow.bias = - 0.00006;
         scene.add(directionalLight);
 
+        //Add an angry feature
+		let page_open = false;
+
+        const you_suck = new THREE.TextureLoader().load( '../IMG/ohmy.png' );
+        const material = new THREE.SpriteMaterial( { map: you_suck } );
+
+        const sprite = new THREE.Sprite( material );
+
+        sprite.scale.set(5,5,5)
+        sprite.visible = false;
+
+        scene.add(sprite);
+
         //render init and attach logic to html
         const container = document.getElementById('container');
 
@@ -291,11 +304,30 @@
             //if player not on floor ( 공중에 떠있다면 )
             if (!playerOnFloor) {
 
+                if(!page_open){
+					page_open = true;
+					console.log(page_open);
+
+					sprite.visible= true;
+					sprite.position.copy(camera.position) // 공중에 떠있을때 보여주고
+
+				}
+
                 playerVelocity.y -= GRAVITY * deltaTime;
 
                 // small air resistance
                 damping *= 0.1;
 
+            }
+
+            if(playerOnFloor){
+
+                if(page_open){
+                    page_open = false;
+                    console.log(page_open);
+                    sprite.visible= false; // 땅에 닿으면 안보이게
+
+                }
             }
 
             playerVelocity.addScaledVector(playerVelocity, damping);
@@ -457,7 +489,7 @@
         var objects_box29 = new RandomObjectGeneration(-49, 25, -29, 3, 3, 3, "./opsidian.jpg");
         var objects_box30 = new RandomObjectGeneration(-41, 18, -15, 3, 3, 3, "./opsidian.jpg");
         //도착지 구체 Creationss
-        const end = new EndSphere(end_radius, end_x, end_y, end_z, "./lava.jpg").end;
+        const end = new EndSphere(end_radius, end_x, end_y, end_z, "./end.png").end;
         // 씬에 추가
         scene.add(objects_floor.floor);
         scene.add(objects_box1.floor);

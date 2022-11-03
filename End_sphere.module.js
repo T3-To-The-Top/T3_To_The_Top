@@ -9,7 +9,8 @@ export class EndSphere {
         // 구체 정의
         this.geometry = new THREE.SphereGeometry(radius);
         this.loader = new THREE.TextureLoader();
-        this.material = new THREE.MeshBasicMaterial({ color: 0x33FFFF });
+
+        this.material = new THREE.MeshBasicMaterial({ map: this.loader.load(texture) });
 
         //구체 Mesh 정의
         this.end = new THREE.Mesh(this.geometry, this.material);
