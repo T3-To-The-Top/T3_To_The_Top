@@ -47,6 +47,6 @@ Server -
 
 VSCode
 
-## lisence
+## Lisence
 
  MIT license
