@@ -1,7 +1,8 @@
 import { con } from database_config.module.js;
 
 module.exports = {
-    //ranking insert query
+
+    // Ranking insert query
     insertRank: (id, clear_time, callback) => {
         const query_string = "insert into Rank(id, clearTime) values (?, ?)";
 
@@ -11,7 +12,8 @@ module.exports = {
             callback(err, result);
         })
     },
-    //ranking top 10 select query
+
+    // Ranking top 10 select query
     getRank: (callback) => {
         const query_string = "select * from Rank order by clearTime DESC limit 10";
 

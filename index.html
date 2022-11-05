@@ -236,11 +236,9 @@
         window.addEventListener('resize', onWindowResize);
 
         function onWindowResize() {
-
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
-
         }
 
         // Throw ball( potal ) function
@@ -250,10 +248,10 @@
 
             camera.getWorldDirection(playerDirection);
 
-            //colider ( hit box ) setting
+            // Colider ( hit box ) setting
             sphere.collider.center.copy(playerCollider.end).addScaledVector(playerDirection, playerCollider.radius * 1.5);
 
-            // throw the ball with more force if we hold the button longer, and if we move forward
+            // Throw the ball with more force if we hold the button longer, and if we move forward
 
             // 기존 던지는 코드에 파워를 곱해버려서 속도 조절
             const impulse = 15 + 30 * (1 - Math.exp((mouseTime - performance.now()) * 0.001)) * ballPower;
@@ -376,24 +374,20 @@
         }
 
         function getForwardVector() {
-
             camera.getWorldDirection(playerDirection);
             playerDirection.y = 0;
             playerDirection.normalize();
 
             return playerDirection;
-
         }
 
         function getSideVector() {
-
             camera.getWorldDirection(playerDirection);
             playerDirection.y = 0;
             playerDirection.normalize();
             playerDirection.cross(camera.up);
 
             return playerDirection;
-
         }
 
         // 파워 레벨 올리는 로직
@@ -562,7 +556,6 @@
         worldOctree.fromGraphNode(objects_box28.floor);
         worldOctree.fromGraphNode(objects_box29.floor);
         worldOctree.fromGraphNode(objects_box30.floor);
-
         worldOctree.fromGraphNode(end);
 
         const helper = new OctreeHelper(worldOctree);
@@ -579,11 +572,9 @@
 
 
         function teleportPlayerIfOob() {
-
             if (camera.position.y <= - 25) {
                 init();
             }
-
         }
 
         // Initialize programß
@@ -604,12 +595,10 @@
             //  an object traversing another too quickly for detection.
 
             for (let i = 0; i < STEPS_PER_FRAME; i++) {
-
                 controls(deltaTime);
                 updatePlayer(deltaTime);
                 updateSpheres(deltaTime);
                 teleportPlayerIfOob();
-
             }
 
             requestAnimationFrame(animate);
@@ -621,5 +610,4 @@
     </script>
 
 </body>
-
 </html>

@@ -46,18 +46,16 @@ Server -
 
 ## Project structure
 .</br>
-├── Curve_path.module.js</br>
-├── End_sphere.module.js</br>
-├── License</br>
-├── README.md</br>
-├── Random_object_generation.module.js</br>
-├── database.module.js</br>
+├── IMG -> image file</br>
+├── three.js-master -> three.js libaray</br>
 ├── database_config.module.js</br>
-├── end.png</br>
+├── database.module.js</br>
+├── End_sphere.module.js</br>
 ├── index.html -> main file</br>
-├── lava.jpg</br>
-├── opsidian.jpg</br>
-└── three.js-master -> three.js libaray</br>
+├── index.js</br>
+├── License</br>
+├── Random_object_generation.module.js</br>
+└── README.md</br>
 
 ## **Development environment**
 

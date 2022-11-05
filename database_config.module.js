@@ -1,6 +1,6 @@
 import { createConnection } from 'mysql';
 
-// database configure
+// Database configure
 const config = {
     development: {
         host: 'database-1.civ5tm3dqze5.ap-northeast-2.rds.amazonaws.com',
@@ -10,10 +10,10 @@ const config = {
     }
 }
 
-//database connection
+// Database connection
 const con = createConnection( config[process.env.NODE_ENV || 'development'] )
 
-//exception handler
+// Exception handler
 con.connect((err) => {
     if(err) throw err;
     console.log('Connected successfully');

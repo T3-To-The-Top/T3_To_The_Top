@@ -12,11 +12,12 @@ export class RandomObjectGeneration {
 
         // BOX 만들고 크기 지정 -> Vertex
         this.geometry = new THREE.BoxGeometry(sizeX, sizeY, sizeZ);
+
         // 색깔 지정 -> Fragment
         this.loader = new THREE.TextureLoader();
         this.material = new THREE.MeshBasicMaterial({ map: this.loader.load(texture) });
 
-        // render를 하는 API이다. (매쉬 추가)
+        // Render를 하는 API (매쉬 추가)
         this.floor = new THREE.Mesh(this.geometry, this.material);
 
         // 다 만들어놓은 애의 위치를 지정한다.
