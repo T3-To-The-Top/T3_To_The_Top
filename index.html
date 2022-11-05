@@ -6,6 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, height=device-height,user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
     <style>
+
         canvas {
             position: relative;
         }
@@ -38,6 +39,7 @@
             font-size: 14px;
             cursor: pointer;
         }
+
     </style>
 </head>
 
@@ -48,6 +50,7 @@
         <p>Throw potal -> Click mouse left button</p>
         <p>Throw power -> &uarr; : Increase power / &darr; : Decrease power</p>
     </div>
+
     <!-- 종료 페이지 -->
     <div id="blocker">
         <div id="instructions">
@@ -62,9 +65,11 @@
 
     <div id="container">
     </div>
+
     <div id="info" style="width: 100%; height: 5rem; text-align: center;">
 		<progress id = "powerLevel" value="1" max="2" style="width:30%; height: inherit;"></progress>
 	</div>
+
     <!-- Three.js lib file import route-->
     <script type="importmap">
 			{
@@ -74,7 +79,6 @@
 				}
 			}
 		</script>
-    
     
     <!-- Core game logic-->
     <script type="module">
@@ -88,19 +92,20 @@
         import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
         import { RandomObjectGeneration } from "./Random_object_generation.module.js";
         import { EndSphere } from "./End_sphere.module.js"
-        //Timer clock init
+
+        // Timer clock init
         const clock = new THREE.Clock();
 
-        //scene init and background init
+        // Scene init and background init
         const scene = new THREE.Scene();
         scene.background = new THREE.Color(0x2c2b2b);
         scene.fog = new THREE.Fog(0x2c2b2b, 0, 50);
 
-        //camera init
+        // Camera init
         const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000);
         camera.rotation.order = 'YXZ';
 
-        //light init
+        // Light init
         const fillLight1 = new THREE.HemisphereLight(0x4488bb, 0x002244, 0.5);
         fillLight1.position.set(2, 1, 1);
         scene.add(fillLight1);
@@ -120,7 +125,7 @@
         directionalLight.shadow.bias = - 0.00006;
         scene.add(directionalLight);
 
-        //Add an angry feature
+        // Add an angry feature
 		let page_open = false;
 
         const you_suck = new THREE.TextureLoader().load( '../IMG/ohmy.png' );
@@ -133,7 +138,7 @@
 
         scene.add(sprite);
 
-        //render init and attach logic to html
+        // Render init and attach logic to html
         const container = document.getElementById('container');
 
         const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -150,12 +155,10 @@
         stats.domElement.style.top = '0px';
         container.appendChild(stats.domElement);
 
-        //Constants
+        // Constants
         const GRAVITY = 30;
-
         const NUM_SPHERES = 100;
         const SPHERE_RADIUS = 0.2;
-
         const STEPS_PER_FRAME = 5;
 
         // Throwed sphere init
@@ -166,7 +169,7 @@
         sphere.receiveShadow = true;
         scene.add(sphere);
 
-        // Trowed potal init
+        // Throwed potal init
         var portal;
         portal = {
             mesh: sphere,
@@ -174,16 +177,17 @@
             velocity: new THREE.Vector3()
         };
 
-        // map object tree
+        // Map object tree
         const worldOctree = new Octree();
 
         // Player hit box
         const playerCollider = new Capsule(new THREE.Vector3(0, 0.35, 0), new THREE.Vector3(0, 1, 0), 0.35);
-        //Player move init
+
+        // Player move init
         const playerVelocity = new THREE.Vector3();
         const playerDirection = new THREE.Vector3();
 
-        let playerOnFloor = false; // check player is on floor
+        let playerOnFloor = false; // Check player is on floor
         let mouseTime = 0;
 
         const keyStates = {};
@@ -192,16 +196,16 @@
         const vector2 = new THREE.Vector3();
         const vector3 = new THREE.Vector3();
 
-        //Throwed ball power
+        // Throwed ball power
         var ballPower = 1;
 
-        // end exit sphere settting
+        // End exit sphere settting
         const end_radius = 2;
         const end_x = 0;
         const end_y = 40;
         const end_z = 0;
 
-        //Key setting and event setting
+        // Key setting and event setting
         document.addEventListener('keydown', (event) => {
             console.log(event.code);
             keyStates[event.code] = true;
@@ -239,7 +243,7 @@
 
         }
 
-        //Throw ball( potal ) function
+        // Throw ball( potal ) function
         function throwBall() {
 
             const sphere = portal;
@@ -296,12 +300,12 @@
 
         }
 
-        //check player moving or standing
+        // Check player moving or standing
         function updatePlayer(deltaTime) {
 
             let damping = Math.exp(- 4 * deltaTime) - 1;
 
-            //if player not on floor ( 공중에 떠있다면 )
+            // If player not on floor ( 공중에 떠있다면 )
             if (!playerOnFloor) {
 
                 if(!page_open){
@@ -315,7 +319,7 @@
 
                 playerVelocity.y -= GRAVITY * deltaTime;
 
-                // small air resistance
+                // Small air resistance
                 damping *= 0.1;
 
             }
@@ -408,7 +412,7 @@
 
         function controls(deltaTime) {
 
-            // gives a bit of air control
+            // Gives a bit of air control
             const speedDelta = deltaTime * (playerOnFloor ? 25 : 8);
 
             // 비동기로 파워 레벨 올리는 콜백
@@ -421,7 +425,7 @@
                 await levelDowner();
             }
 
-            //key down logic
+            // Key down logic
             if (keyStates['KeyW']) {
                 playerVelocity.add(getForwardVector().multiplyScalar(speedDelta));
             }
@@ -451,46 +455,48 @@
 
 
         // Box 생성
-        var objects_floor = new RandomObjectGeneration(0, 0, 0, 100, 0, 100, "./lava.jpg");
+        var objects_floor = new RandomObjectGeneration(0, 0, 0, 100, 0, 100, "../IMG/lava.jpg");
         // x : 34 ~ 50
-        var objects_box1 = new RandomObjectGeneration(37, 15, 25, 3, 3, 3, "./opsidian.jpg");
-        var objects_box2 = new RandomObjectGeneration(44, 8, 15, 3, 3, 3, "./opsidian.jpg");
-        var objects_box3 = new RandomObjectGeneration(34, 22, 4, 3, 3, 3, "./opsidian.jpg");
-        var objects_box4 = new RandomObjectGeneration(49, 18, -11, 3, 3, 3, "./opsidian.jpg");
-        var objects_box5 = new RandomObjectGeneration(38, 28, -37, 3, 3, 3, "./opsidian.jpg");
+        var objects_box1 = new RandomObjectGeneration(37, 15, 25, 3, 3, 3, "../IMG/opsidian.jpg");
+        var objects_box2 = new RandomObjectGeneration(44, 8, 15, 3, 3, 3, "../Img/opsidian.jpg");
+        var objects_box3 = new RandomObjectGeneration(34, 22, 4, 3, 3, 3, "../IMG/opsidian.jpg");
+        var objects_box4 = new RandomObjectGeneration(49, 18, -11, 3, 3, 3, "../IMG/opsidian.jpg");
+        var objects_box5 = new RandomObjectGeneration(38, 28, -37, 3, 3, 3, "../IMG/opsidian.jpg");
         // x : 17 ~ 33
-        var objects_box6 = new RandomObjectGeneration(17, 21, 7, 3, 3, 3, "./opsidian.jpg");
-        var objects_box7 = new RandomObjectGeneration(32, 16, 15, 3, 3, 3, "./opsidian.jpg");
-        var objects_box8 = new RandomObjectGeneration(26, 13, 26, 3, 3, 3, "./opsidian.jpg");
-        var objects_box9 = new RandomObjectGeneration(19, 24, -18, 3, 3, 3, "./opsidian.jpg");
-        var objects_box10 = new RandomObjectGeneration(28, 5, -22, 3, 3, 3, "./opsidian.jpg");
+        var objects_box6 = new RandomObjectGeneration(17, 21, 7, 3, 3, 3, "../IMG/opsidian.jpg");
+        var objects_box7 = new RandomObjectGeneration(32, 16, 15, 3, 3, 3, "../IMG/opsidian.jpg");
+        var objects_box8 = new RandomObjectGeneration(26, 13, 26, 3, 3, 3, "../IMG/opsidian.jpg");
+        var objects_box9 = new RandomObjectGeneration(19, 24, -18, 3, 3, 3, "../IMG/opsidian.jpg");
+        var objects_box10 = new RandomObjectGeneration(28, 5, -22, 3, 3, 3, "../IMG/opsidian.jpg");
         // x : 0 ~ 16
-        var objects_box11 = new RandomObjectGeneration(12, 6, -5, 3, 3, 3, "./opsidian.jpg");
-        var objects_box12 = new RandomObjectGeneration(4, 13, 15, 3, 3, 3, "./opsidian.jpg");
-        var objects_box13 = new RandomObjectGeneration(1, 23, 7, 3, 3, 3, "./opsidian.jpg");
-        var objects_box14 = new RandomObjectGeneration(15, 17, 31, 3, 3, 3, "./opsidian.jpg");
-        var objects_box15 = new RandomObjectGeneration(8, 28, -17, 3, 3, 3, "./opsidian.jpg");
+        var objects_box11 = new RandomObjectGeneration(12, 6, -5, 3, 3, 3, "../IMG/opsidian.jpg");
+        var objects_box12 = new RandomObjectGeneration(4, 13, 15, 3, 3, 3, "../IMG/opsidian.jpg");
+        var objects_box13 = new RandomObjectGeneration(1, 23, 7, 3, 3, 3, "../IMG/opsidian.jpg");
+        var objects_box14 = new RandomObjectGeneration(15, 17, 31, 3, 3, 3, "../IMG/opsidian.jpg");
+        var objects_box15 = new RandomObjectGeneration(8, 28, -17, 3, 3, 3, "../IMG/opsidian.jpg");
         // x : 0 ~ -16
-        var objects_box16 = new RandomObjectGeneration(-7, 9, 35, 3, 3, 3, "./opsidian.jpg");
-        var objects_box17 = new RandomObjectGeneration(-12, 25, -3, 3, 3, 3, "./opsidian.jpg");
-        var objects_box18 = new RandomObjectGeneration(-4, 16, 17, 3, 3, 3, "./opsidian.jpg");
-        var objects_box19 = new RandomObjectGeneration(-1, 22, -24, 3, 3, 3, "./opsidian.jpg");
-        var objects_box20 = new RandomObjectGeneration(-14, 12, -15, 3, 3, 3, "./opsidian.jpg");
+        var objects_box16 = new RandomObjectGeneration(-7, 9, 35, 3, 3, 3, "../IMG/opsidian.jpg");
+        var objects_box17 = new RandomObjectGeneration(-12, 25, -3, 3, 3, 3, "../IMG/opsidian.jpg");
+        var objects_box18 = new RandomObjectGeneration(-4, 16, 17, 3, 3, 3, "../IMG/opsidian.jpg");
+        var objects_box19 = new RandomObjectGeneration(-1, 22, -24, 3, 3, 3, "../IMG/opsidian.jpg");
+        var objects_box20 = new RandomObjectGeneration(-14, 12, -15, 3, 3, 3, "../IMG/opsidian.jpg");
         // x : -17 ~ -33
-        var objects_box21 = new RandomObjectGeneration(-18, 24, 30, 3, 3, 3, "./opsidian.jpg");
-        var objects_box22 = new RandomObjectGeneration(-32, 5, -20, 3, 3, 3, "./opsidian.jpg");
-        var objects_box23 = new RandomObjectGeneration(-25, 17, -37, 3, 3, 3, "./opsidian.jpg");
-        var objects_box24 = new RandomObjectGeneration(-31, 22, 15, 3, 3, 3, "./opsidian.jpg");
-        var objects_box25 = new RandomObjectGeneration(-21, 28, 1, 3, 3, 3, "./opsidian.jpg");
+        var objects_box21 = new RandomObjectGeneration(-18, 24, 30, 3, 3, 3, "../IMG/opsidian.jpg");
+        var objects_box22 = new RandomObjectGeneration(-32, 5, -20, 3, 3, 3, "../IMG/opsidian.jpg");
+        var objects_box23 = new RandomObjectGeneration(-25, 17, -37, 3, 3, 3, "../IMG/opsidian.jpg");
+        var objects_box24 = new RandomObjectGeneration(-31, 22, 15, 3, 3, 3, "../IMG/opsidian.jpg");
+        var objects_box25 = new RandomObjectGeneration(-21, 28, 1, 3, 3, 3, "../IMG/opsidian.jpg");
         // x : -34 ~ -50
-        var objects_box26 = new RandomObjectGeneration(-44, 9, 7, 3, 3, 3, "./opsidian.jpg");
-        var objects_box27 = new RandomObjectGeneration(-36, 21, -9, 3, 3, 3, "./opsidian.jpg");
-        var objects_box28 = new RandomObjectGeneration(-39, 11, 46, 3, 3, 3, "./opsidian.jpg");
-        var objects_box29 = new RandomObjectGeneration(-49, 25, -29, 3, 3, 3, "./opsidian.jpg");
-        var objects_box30 = new RandomObjectGeneration(-41, 18, -15, 3, 3, 3, "./opsidian.jpg");
-        //도착지 구체 Creationss
-        const end = new EndSphere(end_radius, end_x, end_y, end_z, "./end.png").end;
-        // 씬에 추가
+        var objects_box26 = new RandomObjectGeneration(-44, 9, 7, 3, 3, 3, "../IMG/opsidian.jpg");
+        var objects_box27 = new RandomObjectGeneration(-36, 21, -9, 3, 3, 3, "../IMG/opsidian.jpg");
+        var objects_box28 = new RandomObjectGeneration(-39, 11, 46, 3, 3, 3, "../IMG/opsidian.jpg");
+        var objects_box29 = new RandomObjectGeneration(-49, 25, -29, 3, 3, 3, "../IMG/opsidian.jpg");
+        var objects_box30 = new RandomObjectGeneration(-41, 18, -15, 3, 3, 3, "../IMG/opsidian.jpg");
+
+        // 도착지 구체 Creationss
+        const end = new EndSphere(end_radius, end_x, end_y, end_z, "../IMG/end.png").end;
+
+        // Scene에 추가
         scene.add(objects_floor.floor);
         scene.add(objects_box1.floor);
         scene.add(objects_box2.floor);
@@ -523,7 +529,6 @@
         scene.add(objects_box29.floor);
         scene.add(objects_box30.floor);
         scene.add(end);
-
 
         // 충돌 판정 추가
         worldOctree.fromGraphNode(objects_floor.floor);
@@ -581,7 +586,7 @@
 
         }
 
-        //initialize programß
+        // Initialize programß
         function init() {
             playerCollider.start.set(0, 0.35, 0);
             playerCollider.end.set(0, 1, 0);
@@ -590,13 +595,13 @@
             camera.rotation.set(0, 0, 0);
         }
 
-        //animation logic
+        // Animation logic
         function animate() {
 
             const deltaTime = Math.min(0.05, clock.getDelta()) / STEPS_PER_FRAME;
 
-            // we look for collisions in substeps to mitigate the risk of
-            // an object traversing another too quickly for detection.
+            // We look for collisions in substeps to mitigate the risk of
+            //  an object traversing another too quickly for detection.
 
             for (let i = 0; i < STEPS_PER_FRAME; i++) {
 
@@ -612,7 +617,9 @@
 
             stats.update();
         }
+
     </script>
+
 </body>
 
 </html>
