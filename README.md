@@ -6,6 +6,8 @@ This project was conducted from 22.10.13 to 22.11.3 as a computer graphics cours
 
 This project was inspired by **Portal** and **Jump King** and created using an agile approach. 
 
+Image copyrights used within the project (Source: 엉덩국 Blog https://m.blog.naver.com/undernation/222143362396)
+
 ## Tutorial
 
 It is a game where you step on blocks from the starting point and climb up to arrive at the destination.
